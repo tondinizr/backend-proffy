@@ -79,7 +79,7 @@ export default class ClassesController {
 
       return res
         .status(400)
-        .json({ error: "Unexpected error while creating new class!" });
+        .json({ error: "Unexpected error while creating new class! " +  err});
     }
   }
 }
