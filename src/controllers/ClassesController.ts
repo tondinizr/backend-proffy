@@ -41,6 +41,23 @@ export default class ClassesController {
     return res.json(classes);
   }
 
+  async listAll(req: Request, res: Response) {
+    try {
+      const classes = await db("classes")
+        .whereExists(function () {
+          this.select("class_schedule.*")
+            .from("class_schedule")
+            .whereRaw("`class_schedule`.`class_id`");
+        })
+        .join("users", "classes.user_id", "=", "users.id")
+        .select(["classes.*", "users.*"]);
+
+      return res.json(classes);
+    } catch (err) {
+      return res.status(400).json({ error: err });
+    }
+  }
+
   async create(req: Request, res: Response) {
     const { name, avatar, whatsapp, bio, subject, cost, schedule } = req.body;
 
@@ -79,7 +96,7 @@ export default class ClassesController {
 
       return res
         .status(400)
-        .json({ error: "Unexpected error while creating new class! " +  err});
+        .json({ error: "Unexpected error while creating new class! " + err });
     }
   }
 }
